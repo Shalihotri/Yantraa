@@ -326,7 +326,6 @@ and a secret scan. See [CONTRIBUTING.md](https://github.com/Shalihotri/Yantraa/b
 - [ ] Live evidence connectors behind the same tool interface
 - [ ] Larger live runs on the practice set, then a single locked run on the held-out set
 - [ ] External validation on real, anonymised decision logs
-- [ ] Publish to PyPI as `yantraa-evidence`
 
 ## Contributing
 
