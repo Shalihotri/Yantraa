@@ -1,0 +1,41 @@
+# Yantraa Evidence default configuration. Every value is user-editable.
+domain: returns                   # built-in example; or "package.module:ATTR" / "path/file.py:ATTR"
+seed: 42
+prompt_version: p2.0
+data_dir: data                    # cases: <data_dir>/<domain>/<split>.jsonl
+db_path: runs/experiments.db      # runtime results - not committed
+exports_dir: runs/exports
+log_path: logs/yantraa.jsonl      # structured "what went wrong" log
+pricing_file: config/pricing.yaml
+
+# Per-source overrides of the domain's defaults: simulated business cost (USD) and latency.
+# Leave empty to use the domain's values (see `yantraa overview`). Example for "returns":
+#   get_inspection: {cost: 0.25, latency_ms: 2000}
+sources: {}
+
+limits:                           # per case; checked before each call
+  max_fetches: null               # null = every source of the domain, once
+  max_selector_calls: 4
+  max_classifier_calls: 4
+  max_seconds: 30
+  spend_cap_usd: 0.50             # estimate-based; not a guaranteed billing cap
+
+# Penalty (USD-equivalent) when a decision label is chosen wrongly. Empty = the domain's
+# illustrative defaults. Put what mistakes cost *your* business here. Example for "returns":
+#   approve: 20     # wrong approval (refund lost)
+#   reject: 5       # wrong rejection (customer lost)
+#   escalate: 1     # unnecessary hand-off to a person
+loss: {}
+
+provider:
+  mock_model: mock-rules-1
+  mock_latency_ms: 250            # simulated, reported separately from measured wall time
+  decisions_model: gpt-6-luna     # provider "openai" = Decisions API (beta). env YANTRAA_DECISIONS_MODEL
+  openai_model: gpt-6-luna        # provider "openai-responses" = Responses API. env YANTRAA_OPENAI_MODEL
+  openai_timeout_s: 20
+  est_input_tokens: 900           # used for pre-call spend checks and estimates only
+  est_output_tokens: 120
+
+confidence_threshold: 0.85        # tune on dev only; keep test locked
+bootstrap_samples: 2000
+reference_strategy: fetch_all     # the benchmark baseline every strategy is compared against

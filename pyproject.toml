@@ -1,0 +1,47 @@
+[project]
+name = "yantraa-evidence"
+version = "0.3.0"
+description = "Measure whether AI decisions can check less evidence, cost less, and stay correct. Pluggable domains, strategies and benchmarks."
+license = "Apache-2.0"
+readme = "README.md"
+authors = [{ name = "Yantraa Evidence contributors" }]
+keywords = ["llm", "evaluation", "retrieval", "decision-making", "benchmark", "research", "agents", "cost"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+requires-python = ">=3.11"
+dependencies = [
+    "openai>=3.31.0",
+    "pydantic>=2.14.1",
+    "pyyaml>=6.0.3",
+]
+
+[project.scripts]
+yantraa = "yantraa_evidence.cli:main"
+
+[build-system]
+requires = ["uv_build>=0.9.20,<0.10.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+    "ruff>=0.17.0",
+]
+
+[tool.ruff]
+line-length = 120
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B"]
+ignore = ["E741", "B905"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+

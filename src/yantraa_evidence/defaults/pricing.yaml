@@ -1,0 +1,16 @@
+# Versioned, user-editable model pricing (USD per million tokens).
+# A missing model or a null price means "unknown" - cost is reported as unknown, never zero.
+# Keys: plain model name = Responses API; "decisions:<model>" = Decisions API.
+# Source: OpenAI published pricing, checked 2026-10-15. Regional-processing
+# premiums and long-context multipliers are NOT modelled; verify before relying on spend.
+version: pricing-2026-10-15b
+models:
+  mock-rules-1:                   # simulated price so mock runs exercise model-cost accounting
+    input_per_mtok: 0.40
+    output_per_mtok: 1.60
+  decisions:gpt-6-luna:           # Decisions API bills input only
+    input_per_mtok: 0.10
+    output_per_mtok: 0.0
+  gpt-6-luna:                     # Responses API (prompts up to 272K input tokens)
+    input_per_mtok: 0.10
+    output_per_mtok: 0.50

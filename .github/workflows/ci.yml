@@ -1,0 +1,55 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  python:
+    name: Lint, test and build (Python ${{ matrix.python }}, ${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python: ["3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: ${{ matrix.python }}
+      - run: uv sync --locked
+      - run: uv run ruff check src tests examples
+      - run: uv run pytest -q
+      - name: Offline overview -> experiment -> evaluate (no credentials)
+        run: |
+          uv run yantraa overview
+          uv run yantraa experiment --split test --limit 20
+          uv run yantraa evaluate
+          uv run yantraa experiment --domain examples/insurance_claims.py:DOMAIN --limit 10
+      - run: uv build
+      - name: Wheel installs and runs outside the repo
+        shell: bash
+        run: |
+          ENV="$RUNNER_TEMP/wheel-env"
+          uv venv "$ENV"
+          uv pip install --python "$ENV" dist/*.whl
+          Y="$ENV/bin/yantraa"; [ -x "$Y" ] || Y="$ENV/Scripts/yantraa"
+          mkdir "$RUNNER_TEMP/smoke" && cd "$RUNNER_TEMP/smoke"
+          "$Y" experiment --limit 5
+          "$Y" evaluate
+
+  secrets:
+    name: No secrets committed
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

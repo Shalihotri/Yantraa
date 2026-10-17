@@ -1,0 +1,22 @@
+{
+  "generator_version": "returns-gen-2.0.0",
+  "seed": 42,
+  "splits": {
+    "dev": {
+      "n": 120,
+      "answer_distribution": {
+        "approve": 51,
+        "escalate": 32,
+        "reject": 37
+      }
+    },
+    "test": {
+      "n": 120,
+      "answer_distribution": {
+        "approve": 48,
+        "reject": 40,
+        "escalate": 32
+      }
+    }
+  }
+}

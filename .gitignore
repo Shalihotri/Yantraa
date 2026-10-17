@@ -1,0 +1,34 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+dist/
+build/
+*.egg-info/
+
+# Secrets - never commit
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Local runtime data (results, logs, databases)
+runs/
+logs/
+*.db
+*.sqlite
+
+# Private working documents and data you don't own - never commit
+*.docx
+*.xlsx
+*.pdf
+private/
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
