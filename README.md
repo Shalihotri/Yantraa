@@ -12,6 +12,9 @@ at a lower total cost than checking everything. It works for any domain: returns
 ![Runs offline](https://img.shields.io/badge/runs-offline-success)
 ![No UI lock-in](https://img.shields.io/badge/UI-bring%20your%20own-lightgrey)
 
+**[Live showcase →](https://shalihotri.github.io/Yantraa/)** See a decision graph fill in check by check, and compare
+strategies on cost and accuracy.
+
 </div>
 
 ---
