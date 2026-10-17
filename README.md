@@ -79,7 +79,7 @@ flowchart LR
 | **A researcher** | Start from a seeded, reproducible test bed with locked held-out data and exportable traces. |
 | **An app developer** | Build a review console, dashboard or service on plain Python objects, SQLite and CSV/JSONL. |
 
-More detail, with evidence sources and mistake costs for each industry: [docs/use-cases.md](docs/use-cases.md).
+More detail, with evidence sources and mistake costs for each industry: [docs/use-cases.md](https://github.com/Shalihotri/Yantraa/blob/main/docs/use-cases.md).
 
 ## Install and run
 
@@ -110,8 +110,8 @@ Python.
 1. Get the code and install it:
 
    ```bash
-   git clone <repo-url> yantraa-evidence
-   cd yantraa-evidence
+   git clone https://github.com/Shalihotri/Yantraa.git
+   cd Yantraa
    uv sync
    ```
 
@@ -249,7 +249,7 @@ To use it, pass `Experiment(domain="my_module:Chargebacks")` or `--domain path/t
 
 - **Data:** implement `generate(seed)` for synthetic cases, or write your own `Case` records (with the correct answer
   in `oracle_action`) to `data/<domain>/<split>.jsonl`. You can also pass `Experiment(cases=[...])`.
-- **Full worked example:** [examples/insurance_claims.py](examples/insurance_claims.py) covers claims triage with a
+- **Full worked example:** [examples/insurance_claims.py](https://github.com/Shalihotri/Yantraa/blob/main/examples/insurance_claims.py) covers claims triage with a
   generator, and runs in CI.
 - **Another model:** implement `select(obs)` and `classify(obs)`, then pass `Experiment(adapter_factory=...)`.
 
@@ -257,9 +257,9 @@ To use it, pass `Experiment(domain="my_module:Chargebacks")` or `--domain path/t
 
 | What | Where |
 |---|---|
-| API key and model overrides | `.env` (copy [`.env.example`](.env.example)). It is git-ignored. |
-| Domain, source costs, mistake penalties, limits, threshold, paths | [`config/default.yaml`](config/default.yaml), or `Experiment(overrides=...)` per run |
-| Model prices (USD per 1M tokens) | [`config/pricing.yaml`](config/pricing.yaml). Missing prices are reported as *unknown*. |
+| API key and model overrides | `.env` (copy [`.env.example`](https://github.com/Shalihotri/Yantraa/blob/main/.env.example)). It is git-ignored. |
+| Domain, source costs, mistake penalties, limits, threshold, paths | [`config/default.yaml`](https://github.com/Shalihotri/Yantraa/blob/main/config/default.yaml), or `Experiment(overrides=...)` per run |
+| Model prices (USD per 1M tokens) | [`config/pricing.yaml`](https://github.com/Shalihotri/Yantraa/blob/main/config/pricing.yaml). Missing prices are reported as *unknown*. |
 
 Unknown source or label names in config fail loudly instead of being ignored.
 
@@ -287,7 +287,7 @@ docs/              design.md (method, guarantees, findings log) · use-cases.md 
 tests/             isolation, limits, failures, graph round-trip, known answers, custom domains, CLI
 ```
 
-Read [docs/design.md](docs/design.md) before citing a result.
+Read [docs/design.md](https://github.com/Shalihotri/Yantraa/blob/main/docs/design.md) before citing a result.
 
 ## Development
 
@@ -298,9 +298,9 @@ uv run ruff check src tests examples       # lint
 uv build                                   # wheel + sdist in dist/
 ```
 
-CI ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) runs lint and tests on Linux and Windows with Python 3.11
+CI ([`.github/workflows/ci.yml`](https://github.com/Shalihotri/Yantraa/blob/main/.github/workflows/ci.yml)) runs lint and tests on Linux and Windows with Python 3.11
 and 3.12. It also runs the Overview → Experiment → Evaluate flow offline for both domains, a wheel-install smoke test
-and a secret scan. See [CONTRIBUTING.md](CONTRIBUTING.md).
+and a secret scan. See [CONTRIBUTING.md](https://github.com/Shalihotri/Yantraa/blob/main/CONTRIBUTING.md).
 
 ## Privacy & security
 
@@ -318,7 +318,7 @@ and a secret scan. See [CONTRIBUTING.md](CONTRIBUTING.md).
 - Default mistake penalties are illustrative. Set your own, and read the sensitivity table.
 - The mock uses the same rule as the answer key: it validates mechanics, not model quality.
 - An AI's stated confidence is not calibrated correctness. The tool supports comparisons, not causal claims.
-- Live results so far are small-sample. See the [findings log](docs/design.md#findings-log).
+- Live results so far are small-sample. See the [findings log](https://github.com/Shalihotri/Yantraa/blob/main/docs/design.md#findings-log).
 
 ## Roadmap
 
@@ -330,9 +330,9 @@ and a secret scan. See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Contributing
 
-Issues and pull requests are welcome. Please read [CONTRIBUTING.md](CONTRIBUTING.md). In short: keep the information
+Issues and pull requests are welcome. Please read [CONTRIBUTING.md](https://github.com/Shalihotri/Yantraa/blob/main/CONTRIBUTING.md). In short: keep the information
 boundary intact, add tests, and keep negative findings visible.
 
 ## License
 
-[Apache-2.0](LICENSE).
+[Apache-2.0](https://github.com/Shalihotri/Yantraa/blob/main/LICENSE).
