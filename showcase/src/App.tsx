@@ -1,83 +1,130 @@
-import { useEffect, useState } from "react";
-import { Compare } from "./components/Compare";
-import { Explore } from "./components/Explore";
-import { Overview } from "./components/Overview";
-import { UseCases } from "./components/UseCases";
-import raw from "./data/demo.json";
-import type { Demo } from "./types";
+import { useEffect, useState, type ReactNode } from "react";
+import { live, REPO } from "./data";
+import { Demo } from "./sections/Demo";
+import { Findings } from "./sections/Findings";
+import { Fit } from "./sections/Fit";
+import { Hero } from "./sections/Hero";
+import { HowItWorks, Question } from "./sections/Method";
+import { Scale } from "./sections/Scale";
+import { Start } from "./sections/Start";
 
-const demo = raw as unknown as Demo;
-const REPO = "https://github.com/Shalihotri/Yantraa";
-const TABS = [
-  { id: "overview", name: "Overview" },
-  { id: "explore", name: "Explore a decision" },
-  { id: "compare", name: "Compare strategies" },
-  { id: "fit", name: "Fit your use case" },
-] as const;
-type Tab = (typeof TABS)[number]["id"];
+const SECTIONS = [
+  { id: "question", n: "01", short: "The question" },
+  { id: "demo", n: "02", short: "Watch it decide" },
+  { id: "findings", n: "03", short: "What we found" },
+  { id: "how", n: "04", short: "How it works" },
+  { id: "scale", n: "05", short: "At scale" },
+  { id: "fit", n: "06", short: "Your use case" },
+  { id: "start", n: "07", short: "Get started" },
+];
 
-const fromHash = (): Tab => (TABS.find((t) => `#${t.id}` === window.location.hash)?.id ?? "overview");
+function Section({ id, title, kicker, children, wide = false }: {
+  id: string; title: string; kicker?: ReactNode; children: ReactNode; wide?: boolean;
+}) {
+  const s = SECTIONS.find((x) => x.id === id)!;
+  return (
+    <section id={id} className={`section reveal ${wide ? "wide" : ""}`} aria-labelledby={`${id}-h`}>
+      <div className="section-head">
+        <span className="section-n">{s.n}</span>
+        <h2 id={`${id}-h`}>{title}</h2>
+        {kicker && <p className="kicker">{kicker}</p>}
+      </div>
+      {children}
+    </section>
+  );
+}
 
 export function App() {
-  const [tab, setTab] = useState<Tab>(fromHash);
-  const [domainIdx, setDomainIdx] = useState(0);
-  const [theme, setTheme] = useState<"light" | "dark" | null>(null);
-  const domain = demo.domains[domainIdx];
-
+  const [active, setActive] = useState("");
   useEffect(() => {
-    const onHash = () => setTab(fromHash());
-    window.addEventListener("hashchange", onHash);
-    return () => window.removeEventListener("hashchange", onHash);
+    const els = document.querySelectorAll<HTMLElement>(".reveal");
+    const reveal = new IntersectionObserver((es) => es.forEach((e) => e.isIntersecting && e.target.classList.add("in")),
+      { rootMargin: "0px 0px -10% 0px" });
+    els.forEach((el) => reveal.observe(el));
+    const spy = new IntersectionObserver((es) => es.forEach((e) => e.isIntersecting && setActive(e.target.id)),
+      { rootMargin: "-45% 0px -50% 0px" });
+    SECTIONS.forEach((s) => { const el = document.getElementById(s.id); if (el) spy.observe(el); });
+    // Content renders client-side, after the browser's own jump to #anchor, so honour shared deep links here.
+    const target = window.location.hash && document.getElementById(window.location.hash.slice(1));
+    if (target) {
+      els.forEach((el) => el.classList.add("in")); // landing mid-page: show everything, no fade
+      requestAnimationFrame(() => target.scrollIntoView({ behavior: "auto" }));
+    }
+    const failsafe = window.setTimeout(() => els.forEach((el) => el.classList.add("in")), 4000); // never leave content hidden
+    return () => { reveal.disconnect(); spy.disconnect(); window.clearTimeout(failsafe); };
   }, []);
-  useEffect(() => {
-    if (theme) document.documentElement.dataset.theme = theme;
-  }, [theme]);
-  const go = (t: Tab) => { window.location.hash = t; setTab(t); window.scrollTo({ top: 0 }); };
-  const isDark = theme ? theme === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches;
 
   return (
-    <div className="app">
-      <header className="top">
-        <div className="brand">
-          <span className="logo" aria-hidden>◆</span>
-          <span><strong>Yantraa Evidence</strong> <span className="muted">showcase</span></span>
+    <>
+      <a className="skip" href="#question">Skip to content</a>
+      <nav className="nav" aria-label="Site">
+        <a className="wordmark" href="#top"><span className="mark" aria-hidden>✳</span>Yantraa Evidence</a>
+        <div className="nav-links">
+          <a href="#demo">Demo</a><a href="#findings">Findings</a><a href="#how">Method</a><a href="#fit">Use cases</a>
+          <a className="nav-cta" href={REPO} target="_blank" rel="noreferrer">GitHub ↗</a>
         </div>
-        <nav className="tabs" aria-label="Sections">
-          {TABS.map((t) => (
-            <a key={t.id} href={`#${t.id}`} aria-current={tab === t.id ? "page" : undefined}
-               onClick={(e) => { e.preventDefault(); go(t.id); }}>{t.name}</a>
-          ))}
-        </nav>
-        <div className="top-actions">
-          <button className="ghost" onClick={() => setTheme(isDark ? "light" : "dark")}
-                  aria-label={`Switch to ${isDark ? "light" : "dark"} theme`}>{isDark ? "☀" : "☾"}</button>
-          <a className="ghost" href={REPO} target="_blank" rel="noreferrer">GitHub</a>
-        </div>
-      </header>
+      </nav>
 
-      {(tab === "explore" || tab === "compare") && (
-        <div className="domain-bar" role="group" aria-label="Use case">
-          <span className="filter-label">Use case</span>
-          <div className="segmented">
-            {demo.domains.map((d, i) => (
-              <button key={d.name} aria-pressed={i === domainIdx} onClick={() => setDomainIdx(i)}>{d.title}</button>
+      <Hero />
+
+      <div className="layout">
+        <aside className="toc" aria-label="Contents">
+          <ol>
+            {SECTIONS.map((s) => (
+              <li key={s.id} className={active === s.id ? "on" : ""}><a href={`#${s.id}`}><span>{s.n}</span>{s.short}</a></li>
             ))}
-          </div>
-          <span className="muted small">{domain.task}</span>
+          </ol>
+        </aside>
+
+        <main>
+          <Section id="question" title="The question nobody measures">
+            <Question />
+          </Section>
+
+          <Section id="demo" wide title="Watch a real model decide"
+                   kicker={<>Ten return requests, five strategies, one model: {live.model} via the {live.api}. Every
+                     probability below is the model's own. Pick a request, pick a strategy, and step through it.</>}>
+            <Demo />
+            <p className="fig-caption"><span className="fig-n">Figure 2.</span> The evidence graph builds up as the model checks
+              records. Once it decides, each record is linked to the decision as supporting or contradicting it.</p>
+          </Section>
+
+          <Section id="findings" title="What we found">
+            <Findings />
+          </Section>
+
+          <Section id="how" title="How it works" kicker="One loop, five strategies, and a few rules that keep the comparison fair.">
+            <HowItWorks />
+          </Section>
+
+          <Section id="scale" title="Compare strategies before spending a cent"
+                   kicker="The same comparison runs offline on hundreds of synthetic requests, in seconds, for any domain you define.">
+            <Scale />
+          </Section>
+
+          <Section id="fit" title="Built for decisions like yours"
+                   kicker="If a request comes in, records could be checked at a cost, and mistakes have different prices, it fits. Each domain is one Python class.">
+            <Fit />
+          </Section>
+
+          <Section id="start" title="Get started">
+            <Start />
+          </Section>
+        </main>
+      </div>
+
+      <footer className="footer">
+        <div>
+          <span className="wordmark small"><span className="mark" aria-hidden>✳</span>Yantraa Evidence</span>
+          <p>Open source under Apache-2.0. Every request on this page is synthetic. Live results: {live.n_cases} requests,
+            {" "}{live.model}, {live.date}. Penalties are illustrative.</p>
         </div>
-      )}
-
-      <main>
-        {tab === "overview" && <Overview onExplore={() => go("explore")} />}
-        {tab === "explore" && <Explore key={domain.name} domain={domain} strategies={demo.strategies} />}
-        {tab === "compare" && <Compare domain={domain} />}
-        {tab === "fit" && <UseCases />}
-      </main>
-
-      <footer>
-        <span>Open source (Apache-2.0). All data on this page is synthetic and generated by the package itself.</span>
-        <code>pip install yantraa-evidence</code>
+        <div className="footer-links">
+          <a href={REPO} target="_blank" rel="noreferrer">GitHub</a>
+          <a href="https://pypi.org/project/yantraa-evidence/" target="_blank" rel="noreferrer">PyPI</a>
+          <a href={`${REPO}/blob/main/docs/use-cases.md`} target="_blank" rel="noreferrer">Use cases</a>
+        </div>
       </footer>
-    </div>
+    </>
   );
 }

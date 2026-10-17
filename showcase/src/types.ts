@@ -1,21 +1,5 @@
 export type Probs = Record<string, number>;
 
-export interface Stage {
-  after: string | null;
-  status: string | null;
-  probabilities: Probs;
-  conditions: Record<string, number | null> | null;
-  leading: string;
-}
-
-export interface Step {
-  kind: "fetch" | "select" | "classify";
-  action: string;
-  status: string;
-  summary: string;
-  cost: number;
-}
-
 export interface GraphNode {
   id: string;
   kind: string;
@@ -26,27 +10,6 @@ export interface GraphLink {
   src: string;
   dst: string;
   rel: string;
-}
-
-export interface Run {
-  decision: string;
-  correct: boolean;
-  stop_reason: string;
-  fetch_count: number;
-  costs: { retrieval: number; model: number | null; decision_loss: number; total: number | null };
-  steps: Step[];
-  graph: { nodes: GraphNode[]; links: GraphLink[] };
-  evolution: Stage[];
-}
-
-export interface ShowCase {
-  id: string;
-  scenario: string;
-  scenario_label: string;
-  request: string;
-  facts: Record<string, unknown>;
-  answer: string;
-  runs: Record<string, Run>;
 }
 
 export interface Metric {
@@ -89,7 +52,6 @@ export interface DomainData {
   actions: { id: string; meaning: string }[];
   conditions: { id: string; meaning: string }[];
   loss: Record<string, number>;
-  cases: ShowCase[];
   evaluation: {
     text: string;
     n_cases: number;
@@ -97,11 +59,47 @@ export interface DomainData {
     metrics: Metric[];
     paired: Paired[];
     sensitivity: Record<string, { penalty_multiplier: number; mean_total_cost: number | null }[]>;
-    by_scenario: Record<string, Record<string, number>>;
   };
 }
 
 export interface Demo {
   strategies: { id: string; description: string }[];
   domains: DomainData[];
+}
+
+// ---------------------------------------------------------------- live model runs (export_live.py)
+export type LiveEvent =
+  | { type: "plan"; chosen: string; status: string; options: Probs | null }
+  | { type: "check"; source: string; status: string; cost: number }
+  | { type: "judge"; action: string; probabilities: Probs; conditions: Record<string, number> | null };
+
+export interface LiveRun {
+  decision: string;
+  correct: boolean;
+  stop_reason: string;
+  fetch_count: number;
+  costs: { retrieval: number; model: number | null; decision_loss: number; total: number | null };
+  timeline: LiveEvent[];
+  graph: { nodes: GraphNode[]; links: GraphLink[] };
+}
+
+export interface LiveCase {
+  id: string;
+  scenario: string;
+  scenario_label: string;
+  request: string;
+  facts: Record<string, unknown>;
+  answer: string;
+  runs: Record<string, LiveRun>;
+}
+
+export interface Live {
+  model: string;
+  api: string;
+  date: string;
+  n_cases: number;
+  cases: LiveCase[];
+  metrics: Metric[];
+  paired: Paired[];
+  rerun_selective: { accuracy: number; mean_retrievals: number; n: number };
 }
